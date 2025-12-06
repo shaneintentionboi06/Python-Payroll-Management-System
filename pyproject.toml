@@ -1,0 +1,9 @@
+[project]
+name = "Payroll-manager"
+version = "0.1.0"
+description = "This is supposed to a be my college project"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "textual>=6.7.1",
+]
