@@ -15,3 +15,7 @@ Storing money as integer as we don't have decimal in sqlite
 Goals - 
     1. Implement the Database (Done)
     2. Make Existing Code work with sqlite rather than Mysql
+
+
+
+New Idea - Snapshots to recover the database
