@@ -79,7 +79,13 @@ class Connection:
                 In_Time time,
                 Out_Time time, 
                 Foreign Key (Employee_ID) references Employee (Employee_ID)"""}
-
+        views = {"Master View": '''
+                    select * from Employee E,Attendance A,Department D,Payroll P,Salary S 
+                    left join Department D on E.Department_ID = D.Dept_ID
+                    left join Salary S on E.Employee_ID = S.Employee_ID
+                    left join Payroll P on E.Employee_ID = P.Employee_ID
+                    left join Attendance A on E.Employee_ID = A.Employee_ID
+                 '''}
         for i,j in tables.items():
             try:
                 self._cursor_.execute(f"Create Table {i} ({j});")

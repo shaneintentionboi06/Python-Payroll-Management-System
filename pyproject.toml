@@ -7,4 +7,5 @@ requires-python = ">=3.9"
 dependencies = [
     "mysql-connector-python>=9.4.0",
     "textual>=6.7.1",
+    "textual-dev>=1.8.0",
 ]
