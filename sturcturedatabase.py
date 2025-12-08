@@ -40,10 +40,11 @@ tables = {"Department":"""
           Foreign Key (Employee_ID) references Employee (Employee_ID)
           """, 
           
-          "Attendence":"""
-          Attendence_ID INTEGER primary key,
+          "Attendance":"""
+          Attendance_ID INTEGER primary key,
           Employee_ID Integer,
           Attendance_Date Date,
+          Attendance Text Check(Attendance in ('Present','Absent')),
           In_Time time,
           Out_Time time, 
           Foreign Key (Employee_ID) references Employee (Employee_ID)"""}

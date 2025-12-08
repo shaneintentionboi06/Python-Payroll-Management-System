@@ -14,8 +14,9 @@ Storing money as integer as we don't have decimal in sqlite
 
 Goals - 
     1. Implement the Database (Done)
-    2. Make Existing Code work with sqlite rather than Mysql
-
+    2. Make Existing Code work with sqlite rather than Mysql (Not doing this)
+    3. Need to create Views to look across different tables
+        1. Everything(Every Column) 2. Attendance(Name with Attendace) 3.Payment(Name with payment history) 4. Department(Employees in a Department)
 
 
 New Idea - Snapshots to recover the database

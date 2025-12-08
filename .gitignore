@@ -5,7 +5,8 @@ build/
 dist/
 wheels/
 *.egg-info
-*.db
+*.dbW
 # Virtual environments
 .venv
 databasetests/bigdata.db
+sturcturedatabase.py

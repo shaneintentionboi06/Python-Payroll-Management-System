@@ -1,8 +1,8 @@
-#Main Payroll Program (My class 12th Project, this project went well back then)
-import mysql as msq
+#Main Payroll Program
+import mysql.connector as msq
 import datetime
 mydb = msq.connect(host= "localhost" , user= "root" , passwd= "Mech@paul123" , database = "company")
-if mydb.is_connected(   ):         #ConnectionTest
+if mydb.is_connected():         #ConnectionTest
     print('Database Connected')
     Cur= mydb.cursor()
     def printdata():

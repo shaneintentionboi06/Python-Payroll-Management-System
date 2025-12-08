@@ -14,21 +14,21 @@ def insert_dummy_data(host, user, password):
 
         # Insert dummy data into Employee
         employee_data = [
-            ('John Doe', '2023-01-01', 'Manager', 'HR', 'SID_Placeholder', '1234567890'),
-            ('Jane Smith', '2023-02-15', 'Engineer', 'IT', 2, '9876543210')
+            ('John Doe', '2023-01-01', 'Manager', 'HR', '1234567890'),
+            ('Jane Smith', '2023-02-15', 'Engineer', 'IT', '9876543210')
         ]
-        sql = "INSERT INTO Employee (Name, Date_of_joining, Designation, Department, Salary_ID, BANK_ID, Contact) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        sql = "INSERT INTO Employee (Name, Date_of_joining, Designation, Department, Contact) VALUES (%s, %s, %s, %s, %s)"
         mycursor.executemany(sql, employee_data)
 
         # Insert dummy data into Salary_Structure
-        salary_data = [(10000, 5000, 3000, 2000, 1000, 500, 200, 100), 
-                      (15000, 7500, 4500, 3000, 1500, 750, 300, 150)]
-        sql = "INSERT INTO Salary_Structure (Basic_Salary, HRA, DA, Other_Allowance, PF_Contributions, Pro_Tax, Inc_Tax, Other_Deduct) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        salary_data = [(1, 10000, 5000, 3000, 2000, 1000, 500, 200, 100), 
+                      (2, 15000, 7500, 4500, 3000, 1500, 750, 300, 150)]
+        sql = "INSERT INTO Salary (Employee_ID, Basic_Salary, HRA, DA, Other_Allowance, PF_Contributions, Pro_Tax, Inc_Tax, Other_Deduct) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
         mycursor.executemany(sql, salary_data)
-        mycursor.execute('select Salary_ST_ID from salary_structure')
-        Data = Cur.fetchall()
-        last_salary_id = Data[len(Data)-1][0]
-        Replace(employee_data,'SID_Placeholder',last_salary_id)
+        # mycursor.execute('select Salary_ST_ID from salary_structure')
+        # Data = Cur.fetchall()
+        # last_salary_id = Data[len(Data)-1][0]
+        # Replace(employee_data,'SID_Placeholder',last_salary_id)
         # Insert dummy data into Payroll (you'll need to calculate values based on Salary_Structure)
         payroll_data = [
             (1, 20, 25000, 22000, 3000, 0), 
@@ -39,12 +39,12 @@ def insert_dummy_data(host, user, password):
 
         # Insert dummy data into attendance (example)
         attendance_data = [
-            (1, '2023-11-01', 'Present', 'On Time'),
-            (1, '2023-11-02', 'Present', 'Late'),
-            (2, '2023-11-01', 'Present', 'On Time'),
-            (2, '2023-11-02', 'Absent', None)
+            (1, '2023-11-01', 'Present', '10:00',"20:00"),
+            (1, '2023-11-02', 'Present', '9:30',"20:00"),
+            (2, '2023-11-01', 'Present', '10:00',"20:00"),
+            (2, '2023-11-02', 'Absent', '10:00',"20:00")
         ]
-        sql = "INSERT INTO attendance (Employee_ID, Date, Present_Absent, Late_Early) VALUES (%s, %s, %s, %s)"
+        sql = "INSERT INTO Attendence (Employee_ID, Attendance_Date, In_Time, Out_Time) VALUES (%s, %s, %s, %s)"
         mycursor.executemany(sql, attendance_data)
 
         mydb.commit()

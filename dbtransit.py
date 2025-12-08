@@ -1,23 +1,38 @@
 import sqlite3
 import os
 class Connection:
+    '''
+    Connects Database
+    
+    Args - 
+    Database - Name of the Database file
+    '''
     def __init__(self,Database):
         self.name = Database
-        self.cursor = self.get_connection(Database) 
+        self._database_ = self.set_Database(Database)
+        self._cursor_ = self.set_cursor() 
         # self.enteries = self.getrows
-    def get_connection(self,db):
-        Cursor = None
+    def set_Database(self,db):
+        Database = None
         if os.path.isfile(db):
-            Cursor = sqlite3.connect(db)
+            Database = sqlite3.connect(db)
             print("Connection Successful")
         else:
             Choice = input(f"The file {db} doesn't exist. Create new file?(Y/n): ")
-            if Choice == "Y": Cursor = sqlite3.connect(db)
+            if Choice == "Y": Database = sqlite3.connect(db)
             if Choice == "n": print("Connection Failed") 
-        return Cursor
-    
+        return Database
+
+    def set_cursor(self):
+        return self._database_.cursor()
+    def get_cursor(self):
+        return self._cursor_
     def createdatasturcture(self):
+        '''
+        Creates the sturcture(tables) of the database
         
+        :param self: Description
+        '''
         tables = {"Department":"""
                 Dept_ID INTEGER Primary Key autoincrement,
                 Department_Name TEXT""",
@@ -60,12 +75,16 @@ class Connection:
                 Attendence_ID INTEGER primary key,
                 Employee_ID Integer,
                 Attendance_Date Date,
+                Attendance Text Check(Attendance in ('Present','Absent')),
                 In_Time time,
                 Out_Time time, 
                 Foreign Key (Employee_ID) references Employee (Employee_ID)"""}
 
         for i,j in tables.items():
-            self.cursor.execute(f"Create Table {i} ({j});")
+            try:
+                self._cursor_.execute(f"Create Table {i} ({j});")
+            except sqlite3.OperationalError as err:
+                print(f"Error: {err}")
         print("Default Data structure created")
         
     @staticmethod
@@ -79,17 +98,17 @@ class Connection:
         directory = os.listdir()
         db = []
         for i in directory:
-            if i.endswith(".db"): db.append()
+            if i.endswith(".db"): db.append(i)
         return db
 
 
 
 #Testing
 if __name__ == "__main__":
-    Connection.checkdbs()
-    Dataconnect = Connection("hola.db")
+    print(Connection.checkdbs())
+    Dataconnect = Connection("database.db")
     Dataconnect.createdatasturcture()
-    Cursor = Dataconnect.cursor
+    Cursor = Dataconnect.get_cursor()
     print(Cursor.execute("select * from employee").fetchone())
     
     
