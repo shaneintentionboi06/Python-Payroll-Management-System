@@ -1,5 +1,5 @@
 import sqlite3
-def insert_dummy_data(host, user, password):
+def insert_dummy_data():
     """
     Inserts dummy data into the created tables.
 
@@ -11,19 +11,24 @@ def insert_dummy_data(host, user, password):
     try:
         mydb = sqlite3.connect("database.db")
         mycursor = mydb.cursor()
-
+        #Insert Dummy Data to Department
+        departments = [
+            (1,"IT"),
+            (2,"BS")
+        ]
+        sql = "INSERT INTO Department (Dept_ID,Department_Name) VALUES (?, ?)"
         # Insert dummy data into Employee
         employee_data = [
-            ('John Doe', '2023-01-01', 'Manager', 'HR', '1234567890'),
-            ('Jane Smith', '2023-02-15', 'Engineer', 'IT', '9876543210')
+            ('John Doe', '2023-01-01', 'Manager', 1, '1234567890'),
+            ('Jane Smith', '2023-02-15', 'Engineer', 1, '9876543210')
         ]
-        sql = "INSERT INTO Employee (Name, Date_of_joining, Designation, Department, Contact) VALUES (%s, %s, %s, %s, %s)"
+        sql = "INSERT INTO Employee (Name, Date_of_joining, Designation, Department_ID, ContactNo) VALUES (?, ?, ?, ?, ?)"
         mycursor.executemany(sql, employee_data)
 
         # Insert dummy data into Salary_Structure
         salary_data = [(1, 10000, 5000, 3000, 2000, 1000, 500, 200, 100), 
                       (2, 15000, 7500, 4500, 3000, 1500, 750, 300, 150)]
-        sql = "INSERT INTO Salary (Employee_ID, Basic_Salary, HRA, DA, Other_Allowance, PF_Contributions, Pro_Tax, Inc_Tax, Other_Deduct) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        sql = "INSERT INTO Salary (Employee_ID, Basic_Salary, HRA, DA, Other_Allowance, PF_Contribution, Pro_Tax, Inc_Tax, Other_Deductions) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         mycursor.executemany(sql, salary_data)
         # mycursor.execute('select Salary_ST_ID from salary_structure')
         # Data = Cur.fetchall()
@@ -34,7 +39,7 @@ def insert_dummy_data(host, user, password):
             (1, 20, 25000, 22000, 3000, 0), 
             (2, 20, 35000, 31000, 4000, 0)
         ]
-        sql = "INSERT INTO Payroll (Employee_ID, Pay_Period_days, Gross_Salary, Net_Salary, Deductions, Bonuses_Added) VALUES (%s, %s, %s, %s, %s, %s)"
+        sql = "INSERT INTO Payroll (Employee_ID, Pay_Period_days, Gross_Salary, Net_Salary, Deductions, Bonuses_Added) VALUES (?, ?, ?, ?, ?, ?)"
         mycursor.executemany(sql, payroll_data)
 
         # Insert dummy data into attendance (example)
@@ -44,7 +49,7 @@ def insert_dummy_data(host, user, password):
             (2, '2023-11-01', 'Present', '10:00',"20:00"),
             (2, '2023-11-02', 'Absent', '10:00',"20:00")
         ]
-        sql = "INSERT INTO Attendence (Employee_ID, Attendance_Date, In_Time, Out_Time) VALUES (%s, %s, %s, %s)"
+        sql = "INSERT INTO Attendance (Employee_ID, Attendance_Date,Attendance, In_Time, Out_Time) VALUES (?, ?, ?, ?,?)"
         mycursor.executemany(sql, attendance_data)
 
         mydb.commit()
@@ -52,4 +57,4 @@ def insert_dummy_data(host, user, password):
 
     except ValueError as err:
         print(f"Error inserting dummy data: {err}")
-insert_dummy_data("localhost","root","Mech@paul123")
+insert_dummy_data()

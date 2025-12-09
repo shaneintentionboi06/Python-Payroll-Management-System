@@ -71,16 +71,16 @@ class Connection:
                 Foreign Key (Employee_ID) references Employee (Employee_ID)
                 """, 
                 
-                "Attendence":"""
-                Attendence_ID INTEGER primary key,
+                "Attendance":"""
+                Attendance_ID INTEGER primary key,
                 Employee_ID Integer,
                 Attendance_Date Date,
                 Attendance Text Check(Attendance in ('Present','Absent')),
                 In_Time time,
                 Out_Time time, 
                 Foreign Key (Employee_ID) references Employee (Employee_ID)"""}
-        views = {"Master View": '''
-                    select * from Employee E,Attendance A,Department D,Payroll P,Salary S 
+        views = {"masterview": '''
+                    select * Employee
                     left join Department D on E.Department_ID = D.Dept_ID
                     left join Salary S on E.Employee_ID = S.Employee_ID
                     left join Payroll P on E.Employee_ID = P.Employee_ID
@@ -91,7 +91,15 @@ class Connection:
                 self._cursor_.execute(f"Create Table {i} ({j});")
             except sqlite3.OperationalError as err:
                 print(f"Error: {err}")
+        print("Tables are created")
+        # for i,j in views.items():
+        #     try:
+        #         self._cursor_.execute(f"Create view {i} as {j};")
+        #     except sqlite3.OperationalError as err:
+        #         print(f"Error: {err}")
+        # print("Views are created(Hopeffully)")    
         print("Default Data structure created")
+        
         
     @staticmethod
     def checkdbs():
@@ -111,10 +119,12 @@ class Connection:
 
 #Testing
 if __name__ == "__main__":
+    from datamanagement import fetcher
     print(Connection.checkdbs())
     Dataconnect = Connection("database.db")
     Dataconnect.createdatasturcture()
-    Cursor = Dataconnect.get_cursor()
-    print(Cursor.execute("select * from employee").fetchone())
-    
+    Hawk = fetcher(Dataconnect.get_cursor())
+    # Hawk.cursor.execute("select name,type from sqlite_master")
+    # for i in Hawk.cursor: print(i)
+    Hawk.viewdata(Columns="Employee_ID")
     
