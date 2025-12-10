@@ -50,15 +50,17 @@ class fetcher:
         elif Columns:
             needed_table = set()
             needed_table.add("Employee")
-            
+            tablecalls = set()
             for column in Columns:
                 for j,k in self._column_map_.items() :
                     if column in k:
                         needed_table.add(j)
+                        tablecalls.add(j+'.'+column)
             tables = ",".join([i for i in needed_table])
             print(tables)
+            
             #First Get the Header
-            command = f"select {','.join(Columns)} from {tables}"
+            command = f"select {','.join(tablecalls)} from {tables}"
             print(command)
             # self.cursor.execute(command)
             Output = [i for i in self.cursor.execute(command)]
@@ -122,7 +124,7 @@ if __name__ == "__main__":
     # DB.createdatasturcture()
     Feteher = fetcher(DB.get_cursor())
     Entries = Feteher.viewdata("Attendance","In_Time","Out_Time","Name","Employee_ID")
-    
+    for i in Entries: print(i)
     # print(Feteher._columns_)
     # print(Feteher.get_columnmap())
     # print(Feteher.printtable('Attendence'))

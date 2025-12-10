@@ -1,0 +1,25 @@
+.Menu{
+    height: 100%;
+    /* width: 50%; */
+    margin: 4 8;
+    background: $panel;
+    color: $text;
+    border: tall $background;
+    padding: 1 2;
+    content-align: center middle;
+}
+
+.Menu ListView{
+    background: $panel;
+}
+
+.Menu ListItem{
+    align: center middle;
+    padding: 1;
+}
+.Menu Button{
+    content-align: right middle ;
+}
+.Menu Static{
+    content-align: center middle ;
+}
