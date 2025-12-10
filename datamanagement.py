@@ -6,21 +6,31 @@ class fetcher:
         self.cursor = cursor
         # self._columns_ = self._fetchtablesturcture_()
         self._column_map_= self._create_column_map_()
-    
+        self._views_ = self._create_view_map_()
     def _create_column_map_(self):
         #first get names of the table 
         tablemap = {}
-        self.cursor.execute("select name from sqlite_master")
+        self.cursor.execute("select name from sqlite_master where type='table'")
         Tables = [i[0] for i in self.cursor]
         for tb in Tables:
             columns = set()
             self.cursor.execute(f"pragma table_info({tb})")
             for column in self.cursor: columns.add(column[1])
+            if tb != "Employee": columns.discard("Employee_ID")
             tablemap[tb]=columns
         return tablemap
     def get_columnmap(self):
         return self._column_map_
-    
+    def _create_view_map_(self):
+        viewmap = {}
+        self.cursor.execute("select name from sqlite_master where type='view'")
+        views = [i[0] for i in self.cursor]
+        for view in views:
+            Columns = list()
+            self.cursor.execute("pragma table_info({view})")
+            for column in self.cursor: Columns.append(column[1]) 
+            viewmap[view] = tuple(Columns)
+        return viewmap
     # __column_map__= _create_column_map_()
     
     def viewdata(self,*Columns,sview=None,):
@@ -33,7 +43,10 @@ class fetcher:
         :param Columns: a tuple of tuples like (("Attendence","Attend_ID"),("Employee","Name").......) Ignored If sview provided
         '''
         if sview:
-            self.cursor.execute(f"select * from {sview}")
+            if sview in self._views_.keys:
+                head = self._views_[sview]
+                self.cursor.execute(f"select * from {sview}")
+                Output =  [head] + [i for i in self.cursor]
         elif Columns:
             needed_table = set()
             needed_table.add("Employee")
@@ -47,13 +60,11 @@ class fetcher:
             #First Get the Header
             command = f"select {','.join(Columns)} from {tables}"
             print(command)
-            self.cursor.execute(command)
+            # self.cursor.execute(command)
+            Output = [i for i in self.cursor.execute(command)]
         else:
             raise noinput("No Value Provided")
-        
-        Output = [i for i in self.cursor].insert(0,Columns)
-        
-        return Output
+        return [Columns] + list(Output)
         
 
     # def empdata(self,ID,Columns=None): 
@@ -108,9 +119,10 @@ class editor:
 if __name__ == "__main__":
     import dbtransit
     DB = dbtransit.Connection("database.db")
-    DB.createdatasturcture()
+    # DB.createdatasturcture()
     Feteher = fetcher(DB.get_cursor())
-    print(Feteher.viewdata("Attendance","In_Time","Out_Time"))
+    Entries = Feteher.viewdata("Attendance","In_Time","Out_Time","Name","Employee_ID")
+    
     # print(Feteher._columns_)
     # print(Feteher.get_columnmap())
     # print(Feteher.printtable('Attendence'))
