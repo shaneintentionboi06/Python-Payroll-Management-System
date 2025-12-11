@@ -1,3 +1,5 @@
+/* Main Menu Styling */
+
 .Menu{
     height: 100%;
     /* width: 50%; */
@@ -22,4 +24,25 @@
 }
 .Menu Static{
     content-align: center middle ;
+}
+
+/* Export Data Menu stying */
+.Dailog{
+    background: $boost;
+    padding: 2;
+    margin: 10 4;
+    /* align: center middle; */
+    /* width: 50%; */
+}
+
+.Dailog #title{
+    padding: 1;
+    width: 100%;
+    content-align: center middle;
+}
+.Dailog Label{
+    padding: 1;
+}
+.exportdata{
+    background: rgba(0,0,0,0.5) ;
 }

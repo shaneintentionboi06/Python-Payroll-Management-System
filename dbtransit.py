@@ -79,7 +79,7 @@ class Connection:
                 In_Time time,
                 Out_Time time, 
                 Foreign Key (Employee_ID) references Employee (Employee_ID)"""}
-        views = {"masterview": '''
+        views = {"Attendanceview": '''
                     select * Employee
                     left join Department D on E.Department_ID = D.Dept_ID
                     left join Salary S on E.Employee_ID = S.Employee_ID
@@ -98,6 +98,7 @@ class Connection:
         #     except sqlite3.OperationalError as err:
         #         print(f"Error: {err}")
         # print("Views are created(Hopeffully)")    
+        self._database_.commit()
         print("Default Data structure created")
         
         
@@ -126,5 +127,5 @@ if __name__ == "__main__":
     Hawk = fetcher(Dataconnect.get_cursor())
     # Hawk.cursor.execute("select name,type from sqlite_master")
     # for i in Hawk.cursor: print(i)
-    Hawk.viewdata(Columns="Employee_ID")
+    Hawk.viewdata("Employee_ID")
     

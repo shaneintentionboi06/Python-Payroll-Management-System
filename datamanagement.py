@@ -18,6 +18,7 @@ class fetcher:
             for column in self.cursor: columns.add(column[1])
             if tb != "Employee": columns.discard("Employee_ID")
             tablemap[tb]=columns
+        tablemap.pop('sqlite_sequence')
         return tablemap
     def get_columnmap(self):
         return self._column_map_
@@ -68,13 +69,32 @@ class fetcher:
             raise noinput("No Value Provided")
         return [Columns] + list(Output)
         
-
+    def exporttempdata(self,ID): 
+        import csv
+        Data = []
+        for table,columns in self._column_map_.items():
+            if table == "Department": continue
+            command = f"select {','.join(columns)} from {table} where Employee_ID = {ID}"
+            self.cursor.execute(command)
+            Data.append(columns)
+            # row = self.cursor.fetchall()
+            # rows= []
+            # print(row)
+            for row in self.cursor:
+                Data.append(row)
+            # row[0] = row[0].lstrip('(').rstrip(')').split(',')
+        # print(Data)
+        with open(f'Employee{ID}.csv','w') as file: 
+            Writer = csv.writer(file)
+            Writer.writerows(Data)
+        print("Data Exported")
     # def empdata(self,ID,Columns=None): 
     #     column_map = {"Name":"Employee",}
         
     #     return Output
-    def exportempdata(self, ID): 
-        self.cursor.execute(f"select * from ")
+    def empdata(self, ID): 
+        pass
+        # self.cursor.execute(f"select * from ")
     
 
     def paymentdetails(self,Name): pass
@@ -123,8 +143,9 @@ if __name__ == "__main__":
     DB = dbtransit.Connection("database.db")
     # DB.createdatasturcture()
     Feteher = fetcher(DB.get_cursor())
-    Entries = Feteher.viewdata("Attendance","In_Time","Out_Time","Name","Employee_ID")
-    for i in Entries: print(i)
+    Feteher.exporttempdata(1)
+    # Entries = Feteher.viewdata("Attendance","In_Time","Out_Time","Name","Employee_ID")
+    # for i in Entries: print(i)
     # print(Feteher._columns_)
     # print(Feteher.get_columnmap())
     # print(Feteher.printtable('Attendence'))
