@@ -1,9 +1,9 @@
-Name,Designation,Employee_ID,Date_of_Joining,ContactNo,Department_ID
-John Doe,Manager,1,2023-01-01,1234567890,1
-Other_Allowance,Inc_Tax,Salary_ID,HRA,Pro_Tax,PF_Contribution,DA,Basic_Salary,Other_Deductions
-2000,200,1,5000,500,1000,3000,10000,100
-Date_of_Payment,Bonuses_Added,Pay_Period_Days,Gross_Salary,Net_Salary,Payroll_ID,Deductions
-,0,20,25000,22000,1,3000
-Attendance_Date,Attendance,Out_Time,Attendance_ID,In_Time
-2023-11-01,Present,20:00,1,10:00
-2023-11-02,Present,20:00,2,9:30
+Name,Employee_ID,ContactNo,Designation,Department_ID,Date_of_Joining
+John Doe,1,1234567890,Manager,1,2023-01-01
+DA,HRA,Pro_Tax,Other_Allowance,Inc_Tax,Other_Deductions,Basic_Salary,PF_Contribution,Salary_ID
+3000,5000,500,2000,200,100,10000,1000,1
+Bonuses_Added,Payroll_ID,Deductions,Pay_Period_Days,Date_of_Payment,Net_Salary,Gross_Salary
+0,1,3000,20,,22000,25000
+Attendance,Attendance_ID,Attendance_Date,Out_Time,In_Time
+Present,1,2023-11-01,20:00,10:00
+Present,2,2023-11-02,20:00,9:30

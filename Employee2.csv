@@ -1,0 +1,9 @@
+ContactNo,Date_of_Joining,Designation,Employee_ID,Department_ID,Name
+9876543210,2023-02-15,Engineer,2,1,Jane Smith
+Salary_ID,DA,Other_Allowance,Pro_Tax,Other_Deductions,HRA,Inc_Tax,Basic_Salary,PF_Contribution
+2,4500,3000,750,150,7500,300,15000,1500
+Net_Salary,Deductions,Gross_Salary,Pay_Period_Days,Bonuses_Added,Date_of_Payment,Payroll_ID
+31000,4000,35000,20,0,,2
+Out_Time,Attendance_Date,Attendance_ID,Attendance,In_Time
+20:00,2023-11-01,3,Present,10:00
+20:00,2023-11-02,4,Absent,10:00

@@ -59,28 +59,28 @@ class Tableview(Screen):
         Tables = list(Feteher._column_map_.keys())
         yield Header(show_clock=True)
         yield Tabs(*Tables)
+        yield DataTable(id='Table')
         yield Footer()
 
     def action_btn_back(self):
         self.app.pop_screen()
-    # def _on_mount(self):
-    #     table = self.query_one(DataTable)
-    #     table.add_columns(*Entries[0])
-    #     table.add_rows(Entries[1:])
-    #     table.cursor_type = next(cursors)
-    #     table.zebra_stripes = True
+    def _on_mount(self):
+        table = self.query_one(DataTable)
+        table.add_columns(*Entries[0])
+        table.add_rows(Entries[1:])
+        table.cursor_type = next(cursors)
+        table.zebra_stripes = True
 
-    # def key_c(self):
-    #     table = self.query_one(DataTable)
-    #     table.cursor_type = next(cursors)
+    def key_c(self):
+        table = self.query_one(DataTable)
+        table.cursor_type = next(cursors)
 
 class Exportinput(Static):
     def compose(self):
         yield Label("Export Data", id='title')
         yield Label("Employee_ID", id='IDlabel')
-        yield Input(placeholder='Enter ID',id='ID')
+        yield Input(placeholder='Enter ID',id='ID',type='integer',validate_on='submitted')
         yield Label("Name" ,id='Namelabel')
-        yield Input(placeholder='Name',disabled=True,id='Name')
 
 class Exportdatascreen(ModalScreen):
     BINDINGS=[('escape','btn_back','Back to Main Menu')]
@@ -88,6 +88,38 @@ class Exportdatascreen(ModalScreen):
         yield Exportinput(classes='Dailog')
     def action_btn_back(self):
         self.app.pop_screen()
+        
+    def get_employee_ID(self,ID):
+        try:
+            if ID == 0: 
+                return "Enter ID"
+            else:
+                Feteher.cursor.execute(f"select Name from Employee where Employee_ID = {ID}")
+                return Feteher.cursor.fetchone()
+        except Exception as err:
+                return None
+    
+    @on(Input.Submitted,'#ID')
+    def handle_input(self, event: Input.Submitted):
+        Data = event.value
+        try:
+            Feteher.exporttempdata(Data)
+            self.app.notify(f"Data Exported for Emp {Data}")
+        except Exception as err:
+            self.app.notify(f"Failed Error: {err}")
+        self.app.pop_screen()
+    @on(Input.Changed,'#ID')
+    def on_input_changed(self, event: Input.Changed):
+        Data = event.value
+        Nameinput = self.query_one('#Namelabel')
+        
+        if Data.strip():
+            Name = self.get_employee_ID(Data)[0]
+            
+            if Name:
+                Nameinput.update(f"Found: {Name}")
+            else:
+                Nameinput.update(f"Not Found")
 class Testrun(App):
     CSS_PATH="App.css"
     BINDINGS = [('e', 'export','Data Export')]
@@ -99,11 +131,31 @@ class Testrun(App):
     def action_export(self):
         self.app.push_screen(Exportdatascreen())
     
+class form(Screen):
+    def compose(self):
+        yield Header()
+        yield Footer()
+        
+        yield Label('Name', id='namelabel')
+        yield Input(placeholder='Name')
+        
+        yield Label('Department Name', id='deptnamelabel')
+        yield Input(placeholder='Name')
+        
+        yield Label("Date of Joining",id='date_of_joininglabel')
+        yield Input("Date of Joining",id='date_of_joining',value='today')
+        
+        yield Label("Designation",id='designationlabel')
+        yield Input(id='Designation')
+
+        yield Label("Contact",id='Contactlabel')
+        yield Input(id='Contact')
+        
 
 class PayrollApp(App):
     '''The Main APP UI'''
     CSS_PATH = "App.css"
-    BINDINGS = [('c','key_c','Toggle Cursors')]
+    BINDINGS = []
     def compose(self):
         yield Header(show_clock=True)
         # yield Static("Some Text")
@@ -126,17 +178,7 @@ class PayrollApp(App):
         return Feteher.viewdata("Name","ContactNo")
         
 if __name__ == '__main__':
-    # ENTRIES = [
-    # ("lane", "swimmer", "country", "time"),
-    # (4, "Joseph Schooling", "Singapore", 50.39),
-    # (2, "Michael Phelps", "United States", 51.14),
-    # (5, "Chad le Clos", "South Africa", 51.14),
-    # (6, "László Cseh", "Hungary", 51.14),
-    # (3, "Li Zhuhao", "China", 51.26),
-    # (8, "Mehdy Metella", "France", 51.58),
-    # (7, "Tom Shields", "United States", 51.73),
-    # (1, "Aleksandr Sadovnikov", "Russia", 51.84),
-    # (10, "Darren Burns", "Scotland", 51.84),]
+    
     import dbtransit
     from datamanagement import fetcher
     DB = dbtransit.Connection("database.db")
