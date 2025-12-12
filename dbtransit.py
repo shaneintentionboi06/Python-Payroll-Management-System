@@ -5,10 +5,10 @@ class Connection:
     Connects Database
     
     Args - 
-    Database - Name of the Database file
+    Database - Name of the Database file(str)
     '''
-    def __init__(self,Database):
-        self.name = Database
+    def __init__(self,Database="database.db"):
+        self.databasename = Database
         self._database_ = self.set_Database(Database)
         self._cursor_ = self.set_cursor() 
         # self.enteries = self.getrows

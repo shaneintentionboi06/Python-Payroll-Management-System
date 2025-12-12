@@ -3,11 +3,11 @@
 .Menu{
     height: 100%;
     /* width: 50%; */
-    margin: 4 8;
+    margin: 2 ;
     background: $panel;
     color: $text;
     border: tall $background;
-    padding: 1 2;
+    padding: 2 ;
     content-align: center middle;
 }
 
@@ -29,7 +29,7 @@
 /* Export Data Menu stying */
 .Dailog{
     background: $boost;
-    padding: 2;
+    padding: 2 ;
     margin: 10 4;
     /* align: center middle; */
     /* width: 50%; */
@@ -45,4 +45,13 @@
 }
 .exportdata{
     background: rgba(0,0,0,0.5) ;
+}
+
+.Menu Grid{
+    layout:horizontal;
+    height: 10;
+}
+.Menu Grid .github{
+    dock: right;
+    background: white;
 }

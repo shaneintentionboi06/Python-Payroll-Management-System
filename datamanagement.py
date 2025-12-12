@@ -1,3 +1,5 @@
+from math import floor
+from datetime import datetime,time,date,timedelta
 #Errors
 class noinput(Exception):
     pass
@@ -34,7 +36,7 @@ class fetcher:
         return viewmap
     # __column_map__= _create_column_map_()
     
-    def viewdata(self,*Columns,sview=None,):
+    def viewdata(self,*Columns,sview=None,table='all'):
 
         '''
         Docstring for viewdata
@@ -48,6 +50,7 @@ class fetcher:
                 head = self._views_[sview]
                 self.cursor.execute(f"select * from {sview}")
                 Output =  [head] + [i for i in self.cursor]
+                return Output
         elif Columns:
             needed_table = set()
             needed_table.add("Employee")
@@ -58,17 +61,28 @@ class fetcher:
                         needed_table.add(j)
                         tablecalls.add(j+'.'+column)
             tables = ",".join([i for i in needed_table])
-            print(tables)
+            # print(tables)
             
             #First Get the Header
             command = f"select {','.join(tablecalls)} from {tables}"
-            print(command)
+            # print(command)
             # self.cursor.execute(command)
             Output = [i for i in self.cursor.execute(command)]
+            return [Columns] + list(Output)
+        elif table != 'all':
+            self.cursor.execute(f"select * from {table}") #Handling Errors in TUI
+        elif table == 'all':
+            alltables = {}
+            for tab in self._column_map_.keys():
+                data,head = [],[]
+                self.cursor.execute(f"pragma table_info({tab})")
+                for col in self.cursor: head.append(col[1])
+                self.cursor.execute(f'select * from {tab}')
+                data.append(self.cursor.fetchall())
+                alltables[tab]=(tuple(head),tuple(*data))
+            return alltables
         else:
             raise noinput("No Value Provided")
-        return [Columns] + list(Output)
-        
     def exporttempdata(self,ID): 
         import csv
         Data = []
@@ -87,15 +101,20 @@ class fetcher:
         with open(f'Employee{ID}.csv','w') as file: 
             Writer = csv.writer(file)
             Writer.writerows(Data)
-        print("Data Exported")
+        # print("Data Exported")
     # def empdata(self,ID,Columns=None): 
     #     column_map = {"Name":"Employee",}
         
     #     return Output
-    def empdata(self, ID): 
-        pass
-        # self.cursor.execute(f"select * from ")
-    
+    def markattendance(self,ID,Attend):
+        today=date.today().strftime('%Y-%m-%d')
+        Time = datetime.now()
+        Out_time = Time + timedelta(hours=6)
+        query = "Insert into Attendance (Employee_ID, Attendance_Date, Attendance, In_Time,Out_Time) Values (?, ?, ?, ?, ?)"
+        values=(ID,today,Attend,Time.strftime('%H:%M'),Out_time.strftime('%H:%M'))
+        self.cursor.execute(query,values)
+        self.cursor.connection.commit()            
+
 
     def paymentdetails(self,Name): pass
     
@@ -111,39 +130,68 @@ class fetcher:
                 
         return Columns
 
-class editor:
-
-    def __init__(self,cursor):
-        self.cursor = cursor
-
-    def addemp(self,Num): pass
-    
-    def Attend(self,Name): pass
-
-    def pay(self, employee): pass
-
-    def fireemp(self,Name): pass
-    
-    def empdata(self,empname): pass
+    def Calc_PF(self,B_Salary):
+        return floor(B_Salary*0.12)
+    def Prof_tax(self,Salary):
+        if Salary > 10000:
+            return 200
+        elif 7500 < Salary < 10000:
+            return 175
+        else:
+            return 0 
+    def inc_Tax(self,Salary):
+        taxable = Salary - 75000
+        if taxable <= 300000:
+            return 0
         
-    def Salupdate(self,Name,Salary): pass
-    
-    def deleteentity(self,table,ID): 
-        self.cursor.execute(f"delete from {table} where Employee_ID= {ID}")
-    
-    def deletepayroll(self,PayID):
-        self.cursor.execute(f"delete from Payroll where Payroll_ID = {PayID}")
-
-    def updatedata(self,ID,table,entries): #to keep moving I need to decide a UI or not for now I'LL get 
-        '''This Functions updates a record'''
-        self.cursor.execute(f"update {table} set {entries} where Employee_ID = {ID}")
+        if taxable > 300000:
+            return floor(0.5*taxable)
+        #real-life Tax Regime Varies
         
+    def adddata(self,Data):
+        dept_name= Data.get('Department_Name')
+        self.cursor.execute("select Dept_ID from Department where Department_Name= ?",(dept_name,))
+        res = self.cursor.fetchone()
+        
+        if res:
+            dept_id = res[0]
+        else:
+            self.cursor.execute('insert into Department (Department_Name) values (?)',(dept_name,))
+            self.cursor.execute("select Dept_ID from Department where Department_Name= ?",(dept_name,))
+            res = self.cursor.fetchone()
+            dept_id = res[0]
+        emp_query= "Insert into Employee (Name, Date_of_Joining, Designation, Department_ID, ContactNo) values (?, ?, ?, ?, ?)"
+        emp_values = (
+            Data.get("Name"),
+            Data.get("Date_of_Joining"),
+            Data.get("Designation"),
+            dept_id,
+            Data.get('ContactNo')
+        )
+        self.cursor.execute(emp_query,emp_values)
+        last_emp_id = self.cursor.lastrowid
+        
+        sal_query="INSERT INTO Salary (Employee_ID, Basic_Salary, HRA, DA, Other_Allowance, PF_Contribution, Pro_Tax, Inc_Tax, Other_Deductions) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        sal_values = (
+            last_emp_id,
+            Data.get("Basic_Salary",0),
+            Data.get("HRA",0),
+            Data.get("DA",0),
+            Data.get("Other_Allowance",0),
+            self.inc_Tax(eval(Data.get("Basic_Salary"))),
+            self.Prof_tax(eval(Data.get("Basic_Salary"))),
+            self.inc_Tax(eval(Data.get("Basic_Salary"))),
+            0
+        )
+        self.cursor.execute(sal_query,sal_values)
+        self.cursor.connection.commit()
 if __name__ == "__main__":
     import dbtransit
     DB = dbtransit.Connection("database.db")
     # DB.createdatasturcture()
     Feteher = fetcher(DB.get_cursor())
-    Feteher.exporttempdata(1)
+    # Feteher.exporttempdata(1)
+    print(Feteher.viewdata())
     # Entries = Feteher.viewdata("Attendance","In_Time","Out_Time","Name","Employee_ID")
     # for i in Entries: print(i)
     # print(Feteher._columns_)
@@ -162,4 +210,29 @@ if __name__ == "__main__":
     # (7, "Tom Shields", "United States", 51.73),
     # (1, "Aleksandr Sadovnikov", "Russia", 51.84),
     # (10, "Darren Burns", "Scotland", 51.84),]
+# class editor(fetcher):
+    
+#     def __init__(self, cursor):
+#         super().__init__(cursor)
+
+    
+#     def Attend(self,Name): pass
+
+#     def pay(self, employee): pass
+
+#     def fireemp(self,Name): pass
+    
+#     def empdata(self,empname): pass
+        
+#     def Salupdate(self,Name,Salary): pass
+    
+#     def deleteentity(self,table,ID): 
+#         self.cursor.execute(f"delete from {table} where Employee_ID= {ID}")
+    
+#     def deletepayroll(self,PayID):
+#         self.cursor.execute(f"delete from Payroll where Payroll_ID = {PayID}")
+
+#     def updatedata(self,ID,table,entries): #to keep moving I need to decide a UI or not for now I'LL get 
+#         '''This Functions updates a record'''
+#         self.cursor.execute(f"update {table} set {entries} where Employee_ID = {ID}")
     
