@@ -1,6 +1,0 @@
-Employee_ID,Designation,Date_of_Joining,Department_ID,ContactNo,Name
-5,Manager,2025-12-12,1,9131116526,Isaac
-DA,PF_Contribution,Basic_Salary,Pro_Tax,HRA,Other_Deductions,Salary_ID,Other_Allowance,Inc_Tax
-0,0,10000,0,10,0,5,0,0
-Payroll_ID,Net_Salary,Pay_Period_Days,Gross_Salary,Date_of_Payment,Deductions,Bonuses_Added
-Attendance_ID,In_Time,Attendance_Date,Out_Time,Attendance

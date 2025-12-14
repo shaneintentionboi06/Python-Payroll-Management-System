@@ -362,7 +362,7 @@ class PayrollApp(App):
 if __name__ == '__main__':
     
     import dbtransit
-    from datamanagement import fetcher
+    from data_management import fetcher
     # DB = dbtransit.Connection("database.db")
     # DB.createdatasturcture()
     # Fetcher = fetcher(DB.get_cursor())

@@ -1,5 +1,5 @@
 from TUI import PayrollApp
-from datamanagement import fetcher
+from data_management import fetcher
 from dbtransit import Connection
 
 class Payroll(PayrollApp,Connection,fetcher):

@@ -57,4 +57,3 @@ def insert_dummy_data():
 
     except ValueError as err:
         print(f"Error inserting dummy data: {err}")
-insert_dummy_data()

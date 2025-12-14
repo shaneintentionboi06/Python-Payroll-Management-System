@@ -9,3 +9,5 @@ wheels/
 .venv
 databasetests/bigdata.db
 sturcturedatabase.py
+# unimportant files
+.csv

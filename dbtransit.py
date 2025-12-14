@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import DummyData
 class Connection:
     '''
     Connects Database
@@ -19,8 +20,14 @@ class Connection:
             print("Connection Successful")
         else:
             Choice = input(f"The file {db} doesn't exist. Create new file?(Y/n): ")
-            if Choice == "Y": Database = sqlite3.connect(db)
-            if Choice == "n": print("Connection Failed") 
+            if Choice == "Y": 
+                Database = sqlite3.connect(db)
+                dumchoice = input('Do you Want to insert some DummyData (Y/n)')
+                if dumchoice == 'Y': DummyData.insert_dummy_data()
+                print("Connection Successful")
+            if Choice == "n": 
+                print("Connection Failed")
+                quit()
         return Database
 
     def set_cursor(self):
@@ -120,9 +127,9 @@ class Connection:
 
 #Testing
 if __name__ == "__main__":
-    from datamanagement import fetcher
+    from data_management import fetcher
     print(Connection.checkdbs())
-    Dataconnect = Connection("database.db")
+    Dataconnect = Connection("database21.db")
     Dataconnect.createdatasturcture()
     Hawk = fetcher(Dataconnect.get_cursor())
     # Hawk.cursor.execute("select name,type from sqlite_master")
