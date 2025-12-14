@@ -1,11 +1,11 @@
 from TUI import PayrollApp
-from data_management import fetcher
+from data_management import Fetcher
 from dbtransit import Connection
 
 class Payroll(PayrollApp,Connection,fetcher):
     def __init__(self,Database, driver_class = None, css_path = None, watch_css = False, ansi_color = False):
         Connection.__init__(self,Database=Database)
-        self.Fetcher = fetcher(self._database_.cursor())
+        self.fetcher = Fetcher(self._database_.cursor())
         super().__init__(driver_class, css_path, watch_css, ansi_color)
 
 if __name__ == "__main__":

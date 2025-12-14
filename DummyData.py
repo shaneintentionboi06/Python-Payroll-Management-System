@@ -1,5 +1,5 @@
 import sqlite3
-def insert_dummy_data():
+def Insert_dummy_data():
     """
     Inserts dummy data into the created tables.
 

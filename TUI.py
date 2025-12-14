@@ -26,8 +26,8 @@ class Menu(Static):
             Link("contribute on Github",url='https://github.com/shaneintentionboi06/Python-Payroll-Management-System',id='github'))
         yield ListView(
             ListItem(Button("View Tables",id='table')),
-            ListItem(Button("Export Employee Data",id='expemployee')),
-            # ListItem(Button("Update Employee Data",id='update')),
+            ListItem(Button("Export Employee data",id='expemployee')),
+            # ListItem(Button("Update Employee data",id='update')),
             ListItem(Button("Add Employee",id='add')),
             ListItem(Button("Mark Attendance",id='attend')),
             # ListItem(Button("Remove Employee",id='remove'))
@@ -73,7 +73,7 @@ class Tableview(Screen):
         super().__init__(name, id, classes)
     BINDINGS=[('escape','btn_back','Back to Main Menu'),('c','key_c','Toggle Cursor')]
     def compose(self):
-        Tables = list(self.app.Fetcher._column_map_.keys())
+        Tables = list(self.app.fetcher._column_map_.keys())
         yield Header(show_clock=True)
         yield Tabs(*Tables)
         yield DataTable(id='Table')
@@ -116,7 +116,7 @@ class Tableview(Screen):
             except Exception as err:
                 self.app.notify(f"Error: {err}")
     def get_tables(self): 
-        return self.app.Fetcher.viewdata()
+        return self.app.fetcher.viewdata()
 
         
 
@@ -150,37 +150,37 @@ class Exportdatascreen(ModalScreen):
             if ID == 0: 
                 return "Enter ID"
             else:
-                self.app.Fetcher.cursor.execute(f"select Name from Employee where Employee_ID = {ID}")
-                return self.app.Fetcher.cursor.fetchone()
+                self.app.fetcher.cursor.execute(f"select Name from Employee where Employee_ID = {ID}")
+                return self.app.fetcher.cursor.fetchone()
         except Exception as err:
                 return None
     
     @on(Input.Submitted,'#ID')
     def handle_input(self, event: Input.Submitted):
-        Data = event.value
+        data = event.value
         try:
-            self.app.Fetcher.exporttempdata(Data)
-            self.app.notify(f"Data Exported for Emp {Data}")
+            self.app.fetcher.exporttempdata(data)
+            self.app.notify(f"data Exported for Emp {data}")
         except Exception as err:
             self.app.notify(f"Failed Error: {err}",severity='error')
         self.app.pop_screen()
     @on(Input.Changed,'#ID')
     def on_input_changed(self, event: Input.Changed):
         try: 
-            Data = event.value
-            Nameinput = self.query_one('#Namelabel')
-            if Data:    
-                if Data.strip():
-                    Name = self.get_employee_ID(Data)[0]
+            data = event.value
+            nameinput = self.query_one('#Namelabel')
+            if data:    
+                if data.strip():
+                    Name = self.get_employee_ID(data)[0]
 
                     if Name:
-                        Nameinput.update(f"Found: {Name}")
+                        nameinput.update(f"Found: {Name}")
                     else:
-                        Nameinput.update(f"Not Found")
+                        nameinput.update(f"Not Found")
             else:
-                Nameinput.update('Name: ')
+                nameinput.update('Name: ')
         except TypeError as err:
-            Nameinput.update(f"Invalid ID. Error: ID Not Found")
+            nameinput.update(f"Invalid ID. Error: ID Not Found")
         except Exception as err:
             self.app.notify(f"Error: {err}")
 
@@ -196,18 +196,18 @@ class Attendscreen(ModalScreen):
             if ID == 0: 
                 return "Enter ID"
             else:
-                self.app.Fetcher.cursor.execute(f"select Name from Employee where Employee_ID = {ID}")
-                return self.app.Fetcher.cursor.fetchone()
+                self.app.fetcher.cursor.execute(f"select Name from Employee where Employee_ID = {ID}")
+                return self.app.fetcher.cursor.fetchone()
         except Exception as err:
                 return None
     
     @on(Input.Submitted,'#ID')
     def handle_input(self, event: Input.Submitted):
-        Data = event.value
+        data = event.value
         Remark = self.screen.query_one(Select).value
         try:
-            self.app.Fetcher.markattendance(Data,Remark)
-            self.app.notify(f"Attendance Marked for Emp {Data}")
+            self.app.fetcher.markattendance(data,Remark)
+            self.app.notify(f"Attendance Marked for Emp {data}")
             self.app.pop_screen()
         except Exception as err:
             self.app.notify(f"Failed, Error: {err}",severity='error')
@@ -216,11 +216,11 @@ class Attendscreen(ModalScreen):
     @on(Button.Pressed,'#Submit')
     def handle_input(self, event: Button.Pressed):
         Emp_ID = self.query_one('#ID',Input)
-        Data = Emp_ID.value
+        data = Emp_ID.value
         Remark = self.screen.query_one(Select).value
         try:
-            self.app.Fetcher.markattendance(Data,Remark)
-            self.app.notify(f"Attendance Marked for Emp {Data}")
+            self.app.fetcher.markattendance(data,Remark)
+            self.app.notify(f"Attendance Marked for Emp {data}")
             self.app.pop_screen()
         except Exception as err:
             self.app.notify(f"Failed, Error: {err}",severity='error')
@@ -229,20 +229,20 @@ class Attendscreen(ModalScreen):
     @on(Input.Changed,'#ID')
     def on_input_changed(self, event: Input.Changed):
         try: 
-            Data = event.value
-            Nameinput = self.query_one('#Namelabel')
-            if Data:    
-                if Data.strip():
-                    Name = self.get_employee_ID(Data)[0]
+            data = event.value
+            nameinput = self.query_one('#Namelabel')
+            if data:    
+                if data.strip():
+                    Name = self.get_employee_ID(data)[0]
 
                     if Name:
-                        Nameinput.update(f"Found: {Name}")
+                        nameinput.update(f"Found: {Name}")
                     else:
-                        Nameinput.update(f"Not Found")
+                        nameinput.update(f"Not Found")
             else:
-                Nameinput.update('Name: ')
+                nameinput.update('Name: ')
         except TypeError:
-            Nameinput.update("Invalid ID. Please enter Employee_ID")
+            nameinput.update("Invalid ID. Please enter Employee_ID")
         except Exception as err:
             self.app.notify(f"Error  {err} ")
 
@@ -296,8 +296,8 @@ class Form(Screen):
     def on_submit(self):
         import string
         contactno = self.query_one("#ContactNo",Input)
-        Value = contactno.value.strip()
-        if len(Value) < 10:
+        value = contactno.value.strip()
+        if len(value) < 10:
             self.app.notify("Error: No. of Digits Provided for Contact are less than 10",severity='error')
             contactno.focus()
             return None
@@ -313,7 +313,7 @@ class Form(Screen):
         try:
             inputs = self.query(Input) 
             form_data= {input.id:input.value for input in inputs}
-            self.app.Fetcher.adddata(form_data)
+            self.app.fetcher.adddata(form_data)
             self.app.notify("Employee Added")
             self.app.pop_screen()
         except SyntaxError:
@@ -331,12 +331,12 @@ class Update_form(Form): pass
 class Testrun(App):
     CSS_PATH="App.css"
     head= figlet_format("Payroll",font='3-d')
-    BINDINGS = [('e', 'export','Data Export'),('a', 'addemp','Add Employee Menu'),('t', 'view_tables','View Tables'),('u','update','Open Update Form'),('m','attend','Mark Attendance'),
+    BINDINGS = [('e', 'export','data Export'),('a', 'addemp','Add Employee Menu'),('t', 'view_tables','View Tables'),('u','update','Open Update Form'),('m','attend','Mark Attendance'),
                 ('p','paymenu','Open Payroll Menu')]
     def compose(self):
         DB = dbtransit.Connection("database.db")
-        Fetcher = fetcher(DB.get_cursor())
-        self.Fetcher = Fetcher
+        fetcher = fetcher(DB.get_cursor())
+        self.fetcher = fetcher
         
         yield Header()
         yield Label(self.head)
@@ -381,7 +381,7 @@ if __name__ == '__main__':
     from data_management import fetcher
     # DB = dbtransit.Connection("database.db")
     # DB.createdatasturcture()
-    # Fetcher = fetcher(DB.get_cursor())
-    # Entries = self.Fetcher.viewdata("Attendance","In_Time","Out_Time")
+    # fetcher = fetcher(DB.get_cursor())
+    # Entries = self.fetcher.viewdata("Attendance","In_Time","Out_Time")
     Testrun().run()
     # PayrollApp().run()

@@ -14,21 +14,21 @@ class Connection:
         self._cursor_ = self.set_cursor() 
         # self.enteries = self.getrows
     def set_Database(self,db):
-        Database = None
+        database = None
         if os.path.isfile(db):
-            Database = sqlite3.connect(db)
+            database = sqlite3.connect(db)
             print("Connection Successful")
         else:
             Choice = input(f"The file {db} doesn't exist. Create new file?(Y/n): ")
             if Choice == "Y": 
-                Database = sqlite3.connect(db)
+                database = sqlite3.connect(db)
                 dumchoice = input('Do you Want to insert some DummyData (Y/n)')
-                if dumchoice == 'Y': DummyData.insert_dummy_data()
+                if dumchoice == 'Y': DummyData.Insert_dummy_data()
                 print("Connection Successful")
             if Choice == "n": 
                 print("Connection Failed")
                 quit()
-        return Database
+        return database
 
     def set_cursor(self):
         return self._database_.cursor()
@@ -87,7 +87,7 @@ class Connection:
                 Out_Time time, 
                 Foreign Key (Employee_ID) references Employee (Employee_ID)"""}
         views = {"Attendanceview": '''
-                    select * Employee
+                    select * Employee E from Employee
                     left join Department D on E.Department_ID = D.Dept_ID
                     left join Salary S on E.Employee_ID = S.Employee_ID
                     left join Payroll P on E.Employee_ID = P.Employee_ID
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     print(Connection.checkdbs())
     Dataconnect = Connection("database21.db")
     Dataconnect.createdatasturcture()
-    Hawk = fetcher(Dataconnect.get_cursor())
+    Hawk = Fetcher(Dataconnect.get_cursor())
     # Hawk.cursor.execute("select name,type from sqlite_master")
     # for i in Hawk.cursor: print(i)
     Hawk.viewdata("Employee_ID")

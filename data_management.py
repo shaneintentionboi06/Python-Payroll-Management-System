@@ -4,7 +4,7 @@ from sqlite3 import InterfaceError
 #Errors
 class noinput(Exception):
     pass
-class fetcher:
+class Fetcher:
     def __init__(self,cursor):
         self.cursor = cursor
         # self._columns_ = self._fetchtablesturcture_()
@@ -198,9 +198,9 @@ class fetcher:
             Data.get("HRA",0),
             Data.get("DA",0),
             Data.get("Other_Allowance",0),
-            self.inc_Tax(eval(Data.get("Basic_Salary"))),
-            self.Prof_tax(eval(Data.get("Basic_Salary"))),
-            self.inc_Tax(eval(Data.get("Basic_Salary"))),
+            self.inc_Tax(int(Data.get("Basic_Salary"))),
+            self.Prof_tax(int(Data.get("Basic_Salary"))),
+            self.inc_Tax(int(Data.get("Basic_Salary"))),
             0
         )
         self.cursor.execute(sal_query,sal_values)
