@@ -34,7 +34,7 @@ class Connection:
         return self._database_.cursor()
     def get_cursor(self):
         return self._cursor_
-    def createdatasturcture(self):
+    def createdatastructure(self):
         '''
         Creates the sturcture(tables) of the database
         
@@ -87,7 +87,7 @@ class Connection:
                 Out_Time time, 
                 Foreign Key (Employee_ID) references Employee (Employee_ID)"""}
         views = {"Attendanceview": '''
-                    select * Employee E from Employee
+                    select * Employee from Employee E
                     left join Department D on E.Department_ID = D.Dept_ID
                     left join Salary S on E.Employee_ID = S.Employee_ID
                     left join Payroll P on E.Employee_ID = P.Employee_ID
@@ -127,7 +127,7 @@ class Connection:
 
 #Testing
 if __name__ == "__main__":
-    from data_management import fetcher
+    from data_management import Fetcher
     print(Connection.checkdbs())
     Dataconnect = Connection("database21.db")
     Dataconnect.createdatasturcture()
