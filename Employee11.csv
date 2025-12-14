@@ -1,0 +1,5 @@
+Department_ID,Date_of_Joining,Designation,ContactNo,Name,Employee_ID
+3,2025-12-14,,,Isaac,11
+Other_Deductions,HRA,Pro_Tax,Other_Allowance,PF_Contribution,Basic_Salary,Inc_Tax,Salary_ID,DA
+Gross_Salary,Date_of_Payment,Bonuses_Added,Deductions,Payroll_ID,Net_Salary,Pay_Period_Days
+In_Time,Attendance_ID,Attendance_Date,Out_Time,Attendance

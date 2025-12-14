@@ -127,6 +127,7 @@ class Attend(Static):
         yield Input(placeholder='Enter ID',id='ID',type='integer',validate_on='submitted')
         yield Label("Name" ,id='Namelabel')
         yield Select((line,line) for line in ['Present','Absent'])
+        yield Button("Mark",variant='success',id='Submit')
         
 
 class Exportinput(Static):
@@ -207,9 +208,24 @@ class Attendscreen(ModalScreen):
         try:
             self.app.Fetcher.markattendance(Data,Remark)
             self.app.notify(f"Attendance Marked for Emp {Data}")
+            self.app.pop_screen()
         except Exception as err:
             self.app.notify(f"Failed, Error: {err}",severity='error')
             self.app.pop_screen()
+    
+    @on(Button.Pressed,'#Submit')
+    def handle_input(self, event: Button.Pressed):
+        Emp_ID = self.query_one('#ID',Input)
+        Data = Emp_ID.value
+        Remark = self.screen.query_one(Select).value
+        try:
+            self.app.Fetcher.markattendance(Data,Remark)
+            self.app.notify(f"Attendance Marked for Emp {Data}")
+            self.app.pop_screen()
+        except Exception as err:
+            self.app.notify(f"Failed, Error: {err}",severity='error')
+            self.app.pop_screen()
+    
     @on(Input.Changed,'#ID')
     def on_input_changed(self, event: Input.Changed):
         try: 
