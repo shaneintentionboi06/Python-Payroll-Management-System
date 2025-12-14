@@ -1,0 +1,4 @@
+Name,Date_of_Joining,Department_ID,ContactNo,Employee_ID,Designation
+Inc_Tax,Basic_Salary,HRA,Salary_ID,PF_Contribution,Pro_Tax,Other_Allowance,Other_Deductions,DA
+Pay_Period_Days,Deductions,Gross_Salary,Net_Salary,Date_of_Payment,Bonuses_Added,Payroll_ID
+Out_Time,Attendance_ID,In_Time,Attendance_Date,Attendance

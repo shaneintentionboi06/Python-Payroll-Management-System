@@ -1,9 +1,10 @@
-ContactNo,Date_of_Joining,Designation,Employee_ID,Department_ID,Name
-9876543210,2023-02-15,Engineer,2,1,Jane Smith
-Salary_ID,DA,Other_Allowance,Pro_Tax,Other_Deductions,HRA,Inc_Tax,Basic_Salary,PF_Contribution
-2,4500,3000,750,150,7500,300,15000,1500
-Net_Salary,Deductions,Gross_Salary,Pay_Period_Days,Bonuses_Added,Date_of_Payment,Payroll_ID
-31000,4000,35000,20,0,,2
-Out_Time,Attendance_Date,Attendance_ID,Attendance,In_Time
-20:00,2023-11-01,3,Present,10:00
-20:00,2023-11-02,4,Absent,10:00
+Employee_ID,Name,ContactNo,Designation,Department_ID,Date_of_Joining
+2,Jane Smith,9876543210,Engineer,1,2023-02-15
+Other_Deductions,DA,HRA,Basic_Salary,PF_Contribution,Inc_Tax,Pro_Tax,Other_Allowance,Salary_ID
+150,4500,7500,15000,1500,300,750,3000,2
+Bonuses_Added,Date_of_Payment,Deductions,Net_Salary,Gross_Salary,Payroll_ID,Pay_Period_Days
+0,,4000,31000,35000,2,20
+Out_Time,Attendance_ID,Attendance_Date,In_Time,Attendance
+20:00,3,2023-11-01,10:00,Present
+20:00,4,2023-11-02,10:00,Absent
+11:06,5,2025-12-12,05:06,Present

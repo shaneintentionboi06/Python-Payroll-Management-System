@@ -1,5 +1,6 @@
 from math import floor
 from datetime import datetime,time,date,timedelta
+from sqlite3 import InterfaceError
 #Errors
 class noinput(Exception):
     pass
@@ -83,25 +84,35 @@ class fetcher:
             return alltables
         else:
             raise noinput("No Value Provided")
+    
+    
+    
     def exporttempdata(self,ID): 
         import csv
         Data = []
-        for table,columns in self._column_map_.items():
-            if table == "Department": continue
-            command = f"select {','.join(columns)} from {table} where Employee_ID = {ID}"
-            self.cursor.execute(command)
-            Data.append(columns)
-            # row = self.cursor.fetchall()
-            # rows= []
-            # print(row)
-            for row in self.cursor:
-                Data.append(row)
-            # row[0] = row[0].lstrip('(').rstrip(')').split(',')
-        # print(Data)
-        with open(f'Employee{ID}.csv','w') as file: 
-            Writer = csv.writer(file)
-            Writer.writerows(Data)
-        # print("Data Exported")
+        self.cursor.execute(f"select Employee_ID from Employee where Employee_ID = {ID}")
+        if self.cursor.fetchone():
+            for table,columns in self._column_map_.items():
+                if table == "Department": continue
+                command = f"select {','.join(columns)} from {table} where Employee_ID = {ID}"
+                self.cursor.execute(command)
+                Data.append(tuple(columns))
+                # row = self.cursor.fetchall()
+                # rows= []
+                # print(row)
+                for row in self.cursor:
+                    Data.append(row)
+                # row[0] = row[0].lstrip('(').rstrip(')').split(',')
+            print(Data)
+            if len(Data) == 0: raise noinput("Employee Not Found")    
+            else:
+                with open(f'Employee{ID}.csv','w') as file: 
+                    Writer = csv.writer(file)
+                    Writer.writerows(Data)
+        else:
+            raise noinput("The given ID is not Valid")
+        
+            # print("Data Exported")
     # def empdata(self,ID,Columns=None): 
     #     column_map = {"Name":"Employee",}
         
@@ -112,11 +123,20 @@ class fetcher:
         Out_time = Time + timedelta(hours=6)
         query = "Insert into Attendance (Employee_ID, Attendance_Date, Attendance, In_Time,Out_Time) Values (?, ?, ?, ?, ?)"
         values=(ID,today,Attend,Time.strftime('%H:%M'),Out_time.strftime('%H:%M'))
-        self.cursor.execute(query,values)
-        self.cursor.connection.commit()            
+        try:
+            self.cursor.execute("select Employee_ID from Employee")
+            self.cursor.execute(query,values)
+        except InterfaceError as err:
+            raise noinput('Invalid or No Input Provided')
+        else: self.cursor.connection.commit()            
 
 
-    def paymentdetails(self,Name): pass
+    def paymentdetails(self,ID): 
+        self.cursor.execute(f"select MAX(Salary_ID) from Salary where Employee_ID = {ID}")
+        Salary_ID = self.cursor.fetchone()
+        self.cursor.execute(f'select * from Salary where Salary_ID = {Salary_ID[0]} ;')
+        Details = self.cursor.fetchone()
+        return Details
     
         
     def _fetchtablesturcture_(self):
@@ -185,54 +205,18 @@ class fetcher:
         )
         self.cursor.execute(sal_query,sal_values)
         self.cursor.connection.commit()
+    def updatedata(self,upcolumn,value,ID): 
+        table = None
+        for name,columns in self._column_map_.items():
+            if upcolumn in columns : table = name
+        self.cursor.execute(f'Update {table} set {upcolumn} = {value} where Employee_ID = {ID}')
+        self.cursor.connection.commit()  
 if __name__ == "__main__":
     import dbtransit
     DB = dbtransit.Connection("database.db")
     # DB.createdatasturcture()
     Feteher = fetcher(DB.get_cursor())
-    # Feteher.exporttempdata(1)
-    print(Feteher.viewdata())
-    # Entries = Feteher.viewdata("Attendance","In_Time","Out_Time","Name","Employee_ID")
-    # for i in Entries: print(i)
-    # print(Feteher._columns_)
-    # print(Feteher.get_columnmap())
-    # print(Feteher.printtable('Attendence'))
-    
-    
-    #     ENTRIES = [
-    # ("lane", "swimmer", "country", "time"),
-    # (4, "Joseph Schooling", "Singapore", 50.39),
-    # (2, "Michael Phelps", "United States", 51.14),
-    # (5, "Chad le Clos", "South Africa", 51.14),
-    # (6, "László Cseh", "Hungary", 51.14),
-    # (3, "Li Zhuhao", "China", 51.26),
-    # (8, "Mehdy Metella", "France", 51.58),
-    # (7, "Tom Shields", "United States", 51.73),
-    # (1, "Aleksandr Sadovnikov", "Russia", 51.84),
-    # (10, "Darren Burns", "Scotland", 51.84),]
-# class editor(fetcher):
-    
-#     def __init__(self, cursor):
-#         super().__init__(cursor)
-
-    
-#     def Attend(self,Name): pass
-
-#     def pay(self, employee): pass
-
-#     def fireemp(self,Name): pass
-    
-#     def empdata(self,empname): pass
-        
-#     def Salupdate(self,Name,Salary): pass
-    
-#     def deleteentity(self,table,ID): 
-#         self.cursor.execute(f"delete from {table} where Employee_ID= {ID}")
-    
-#     def deletepayroll(self,PayID):
-#         self.cursor.execute(f"delete from Payroll where Payroll_ID = {PayID}")
-
-#     def updatedata(self,ID,table,entries): #to keep moving I need to decide a UI or not for now I'LL get 
-#         '''This Functions updates a record'''
-#         self.cursor.execute(f"update {table} set {entries} where Employee_ID = {ID}")
+    # Feteher.exporttempdata(2000)
+    Feteher.paymentdetails(2)
+    # Feteher.updatedata(upcolumn='Department_ID',value=7,ID=1)
     

@@ -47,7 +47,6 @@ class Menu(Static):
     def callattend(self):
         self.app.push_screen(Attendscreen())    
 
-
 # class Thetable(Static):
 #     BINDINGS= [('c','key_c','Toggle Cursors')]
 #     def compose(self):
@@ -132,7 +131,8 @@ class Attend(Static):
 
 class Exportinput(Static):
     def compose(self):
-        yield Label("Export Data", id='title')
+        self.title = 'Export Menu'
+        yield Label(self.title, id='title')
         yield Label("Employee_ID", id='IDlabel')
         yield Input(placeholder='Enter ID',id='ID',type='integer',validate_on='submitted')
         yield Label("Name" ,id='Namelabel')
@@ -161,7 +161,7 @@ class Exportdatascreen(ModalScreen):
             self.app.Fetcher.exporttempdata(Data)
             self.app.notify(f"Data Exported for Emp {Data}")
         except Exception as err:
-            self.app.notify(f"Failed Error: {err}")
+            self.app.notify(f"Failed Error: {err}",severity='error')
         self.app.pop_screen()
     @on(Input.Changed,'#ID')
     def on_input_changed(self, event: Input.Changed):
@@ -178,8 +178,8 @@ class Exportdatascreen(ModalScreen):
                         Nameinput.update(f"Not Found")
             else:
                 Nameinput.update('Name: ')
-        except TypeError:
-            Nameinput.update("Invalid ID. Please enter Employee_ID")
+        except TypeError as err:
+            Nameinput.update(f"Invalid ID. Error: ID Not Found")
         except Exception as err:
             self.app.notify(f"Error: {err}")
 
@@ -208,8 +208,8 @@ class Attendscreen(ModalScreen):
             self.app.Fetcher.markattendance(Data,Remark)
             self.app.notify(f"Attendance Marked for Emp {Data}")
         except Exception as err:
-            self.app.notify(f"Failed, Error: Invalid Employee_ID")
-        self.app.pop_screen()
+            self.app.notify(f"Failed, Error: {err}",severity='error')
+            self.app.pop_screen()
     @on(Input.Changed,'#ID')
     def on_input_changed(self, event: Input.Changed):
         try: 
@@ -228,18 +228,108 @@ class Attendscreen(ModalScreen):
         except TypeError:
             Nameinput.update("Invalid ID. Please enter Employee_ID")
         except Exception as err:
+            self.app.notify(f"Error  {err} ")
+
+class Contact(Validator):
+    def validate(self, value):
+        if len(value) == 10: return self.success()
+        else: return self.failure()
+
+class Form(Screen):
+    BINDINGS=[('escape','btn_back','Back to Main Menu')]
+    def compose(self):
+        self.designation = None
+        yield Header()
+        yield Footer()
+        with VerticalScroll(id="Data_form",classes='Data_form'):    
+            yield Label("Basic Details",classes='head')
+            
+            yield Label('Name', id='namelabel')
+            yield Input(placeholder='Enter',id='Name',classes='Alpha')
+            
+            yield Label("Department Details",classes='head')
+            yield Label('Department Name', id='deptnamelabel')
+            yield Input(placeholder='Enter',id='Department_Name',classes='Alpha')
+            
+            yield Label("Date of Joining",id='date_of_joininglabel')
+            yield Input(date.today().strftime('%Y-%m-%d'),id='Date_of_Joining')
+            
+            yield Label("Designation",id='designationlabel')
+            yield Input(placeholder='Enter',id='Designation', value=self.designation,classes='Alpha')
+
+            yield Label("Contact",id='Contactlabel')
+            yield Input(id='ContactNo',type="integer",validators=[Contact()],max_length=10)
+            
+            yield Label("Salary Details",classes='head')
+            yield Label("Salary Amount",id='Salaryamtlabel')
+            yield Input(id='Basic_Salary',placeholder="Enter",type='integer')
+            
+            yield Label('House Rent Allowance',id='HRAlabel')
+            yield Input(placeholder='Enter',id='HRA',type='integer')
+            
+            yield Label('Dearness Allowance', id='DAlabel')
+            yield Input(placeholder='Enter', id='DA',type='integer')
+            
+            yield Label('Other Allowance',id='OTAlabel')
+            yield Input(placeholder='Enter',id='Other_allowance',type='integer')
+            yield Button('Submit',id='Submit',variant='success')
+    
+    def action_btn_back(self):
+        self.app.pop_screen()
+    @on(Button.Pressed,'#Submit')
+    def on_submit(self):
+        import string
+        contactno = self.query_one("#ContactNo",Input)
+        Value = contactno.value.strip()
+        if len(Value) < 10:
+            self.app.notify("Error: No. of Digits Provided for Contact are less than 10",severity='error')
+            contactno.focus()
+            return None
+        text_fields = self.query('.Alpha')
+        specialchar = set(string.punctuation)
+        for field in text_fields:
+            if any(char.isdigit for char in field.value):
+                self.app.notify(f'Warning: {field.id} has numbers',severity='warning')
+            if any(char in specialchar for char in field.value):
+                self.app.notify(f'Warning: {field.id} has special characters',severity='error')
+                field.focus()
+                return None
+        try:
+            inputs = self.query(Input) 
+            form_data= {input.id:input.value for input in inputs}
+            self.app.Fetcher.adddata(form_data)
+            self.app.notify("Employee Added")
+            self.app.pop_screen()
+        except SyntaxError:
+            self.app.notify('Error: Invalid or required fields not provided')
+        except Exception as err:
             self.app.notify(f"Error: {err}")
+
+class Payrollmenu(Exportinput): pass
+
+class Payrollscreen(Screen): pass
+    
+class Update_form(Form): pass
+    
 
 class Testrun(App):
     CSS_PATH="App.css"
     head= figlet_format("Payroll",font='3-d')
-    BINDINGS = [('e', 'export','Data Export'),('a', 'addemp','Add Employee Menu'),('t', 'view_tables','View Tables')]
+    BINDINGS = [('e', 'export','Data Export'),('a', 'addemp','Add Employee Menu'),('t', 'view_tables','View Tables'),('u','update','Open Update Form'),('m','attend','Mark Attendance'),
+                ('p','paymenu','Open Payroll Menu')]
     def compose(self):
+        DB = dbtransit.Connection("database.db")
+        Fetcher = fetcher(DB.get_cursor())
+        self.Fetcher = Fetcher
+        
         yield Header()
         yield Label(self.head)
         yield Label("Press E to export data")
         yield Label("Press A to Add Employee Menu")
         yield Label("Press T to view tables")
+        yield Label("Press U to open Update form ")
+        yield Label("Press P to open Payroll menu ")
+        yield Label("Press M to Mark Attendance")
         yield Footer()
         
     def action_export(self):
@@ -248,58 +338,13 @@ class Testrun(App):
         self.app.push_screen(Form())
     def action_view_tables(self):
         self.app.push_screen(Tableview())
+    def action_update(self):
+        self.app.push_screen(Update_form())
+    def action_paymenu(self):
+        self.app.push_screen(Payrollscreen())
+    def action_attend(self):
+        self.app.push_screen(Attendscreen())
 
-class Form(Screen):
-    BINDINGS=[('escape','btn_back','Back to Main Menu')]
-    def compose(self):
-            
-        yield Header()
-        yield Footer()
-        with VerticalScroll(id="Data_form",classes='Data_form'):    
-            yield Label("Basic Details",classes='head')
-            
-            yield Label('Name', id='namelabel')
-            yield Input(placeholder='Enter',id='Name')
-            
-            yield Label("Department Details",classes='head')
-            yield Label('Department Name', id='deptnamelabel')
-            yield Input(placeholder='Enter',id='Department_Name')
-            
-            yield Label("Date of Joining",id='date_of_joininglabel')
-            yield Input(date.today().strftime('%Y-%m-%d'),id='Date_of_Joining')
-            
-            yield Label("Designation",id='designationlabel')
-            yield Input(placeholder='Enter',id='Designation')
-
-            yield Label("Contact",id='Contactlabel')
-            yield Input(id='ContactNo',type="integer")
-            
-            yield Label("Salary Details",classes='head')
-            yield Label("Salary Amount",id='Salaryamtlabel')
-            yield Input(id='Basic_Salary',placeholder="Enter")
-            
-            yield Label('House Rent Allowance',id='HRAlabel')
-            yield Input(placeholder='Enter',id='HRA')
-            
-            yield Label('Dearness Allowance', id='DAlabel')
-            yield Input(placeholder='Enter', id='DA')
-            
-            yield Label('Other Allowance',id='OTAlabel')
-            yield Input(placeholder='Enter',id='Other_allowance')
-            yield Button('Submit',id='Submit',variant='success')
-    
-    def action_btn_back(self):
-        self.app.pop_screen()
-    @on(Button.Pressed,'#Submit')
-    def on_submit(self):
-        try:
-            inputs = self.query(Input) 
-            form_data= {input.id:input.value for input in inputs}
-            self.app.Fetcher.adddata(form_data)
-            self.app.notify("Employee Added")
-            self.app.pop_screen()
-        except Exception as err:
-            self.app.notify(f"Error: {err}")
 class PayrollApp(App):
     '''The Main APP UI'''
     CSS_PATH = "App.css"
@@ -318,9 +363,9 @@ if __name__ == '__main__':
     
     import dbtransit
     from datamanagement import fetcher
-    DB = dbtransit.Connection("database.db")
+    # DB = dbtransit.Connection("database.db")
     # DB.createdatasturcture()
-    Fetcher = fetcher(DB.get_cursor())
+    # Fetcher = fetcher(DB.get_cursor())
     # Entries = self.Fetcher.viewdata("Attendance","In_Time","Out_Time")
-    # Testrun().run()
-    PayrollApp().run()
+    Testrun().run()
+    # PayrollApp().run()
