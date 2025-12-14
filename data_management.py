@@ -215,8 +215,8 @@ if __name__ == "__main__":
     import dbtransit
     DB = dbtransit.Connection("database.db")
     # DB.createdatasturcture()
-    Feteher = fetcher(DB.get_cursor())
+    feteher = Fetcher(DB.get_cursor())
     # Feteher.exporttempdata(2000)
-    Feteher.paymentdetails(2)
+    feteher.paymentdetails(2)
     # Feteher.updatedata(upcolumn='Department_ID',value=7,ID=1)
     
