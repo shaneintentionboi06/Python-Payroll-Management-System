@@ -23,7 +23,7 @@ class Connection:
             if Choice == "Y": 
                 database = sqlite3.connect(db)
                 print("File Created. Building Data Structure")
-                self._createdatastructure_()
+                self._createdatastructure_(database)
                 dumchoice = input('Do you Want to insert some DummyData (Y/n)')
                 if dumchoice == 'Y': DummyData.Insert_dummy_data()
                 print("Connection Successful")
@@ -36,12 +36,13 @@ class Connection:
         return self._database_.cursor()
     def get_cursor(self):
         return self._cursor_
-    def _createdatastructure_(self):
+    def _createdatastructure_(self,database):
         '''
         Creates the sturcture(tables) of the database
         
         :param self: Description
         '''
+        Cursor = database.cursor()
         tables = {"Department":"""
                 Dept_ID INTEGER Primary Key autoincrement,
                 Department_Name TEXT""",
@@ -97,7 +98,7 @@ class Connection:
                  '''}
         for i,j in tables.items():
             try:
-                self._cursor_.execute(f"Create Table {i} ({j});")
+                Cursor.execute(f"Create Table {i} ({j});")
             except sqlite3.OperationalError as err:
                 print(f"Error: {err}")
         print("Tables are created")
@@ -107,7 +108,7 @@ class Connection:
         #     except sqlite3.OperationalError as err:
         #         print(f"Error: {err}")
         # print("Views are created(Hopeffully)")    
-        self._database_.commit()
+        database.commit()
         print("Default Data structure created")
         
         
@@ -132,7 +133,7 @@ if __name__ == "__main__":
     from data_management import Fetcher
     print(Connection.checkdbs())
     Dataconnect = Connection("database21.db")
-    Dataconnect.createdatasturcture()
+    Dataconnect._createdatastructure_(Dataconnect)
     Hawk = Fetcher(Dataconnect.get_cursor())
     # Hawk.cursor.execute("select name,type from sqlite_master")
     # for i in Hawk.cursor: print(i)
