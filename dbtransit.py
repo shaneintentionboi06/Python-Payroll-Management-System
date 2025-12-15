@@ -22,6 +22,8 @@ class Connection:
             Choice = input(f"The file {db} doesn't exist. Create new file?(Y/n): ")
             if Choice == "Y": 
                 database = sqlite3.connect(db)
+                print("File Created. Building Data Structure")
+                self._createdatastructure_()
                 dumchoice = input('Do you Want to insert some DummyData (Y/n)')
                 if dumchoice == 'Y': DummyData.Insert_dummy_data()
                 print("Connection Successful")
@@ -34,7 +36,7 @@ class Connection:
         return self._database_.cursor()
     def get_cursor(self):
         return self._cursor_
-    def createdatastructure(self):
+    def _createdatastructure_(self):
         '''
         Creates the sturcture(tables) of the database
         

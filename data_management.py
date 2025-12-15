@@ -2,7 +2,7 @@ from math import floor
 from datetime import datetime,time,date,timedelta
 from sqlite3 import InterfaceError
 #Errors
-class noinput(Exception):
+class NoInput(Exception):
     pass
 class Fetcher:
     def __init__(self,cursor):
@@ -83,7 +83,7 @@ class Fetcher:
                 alltables[tab]=(tuple(head),tuple(*data))
             return alltables
         else:
-            raise noinput("No Value Provided")
+            raise NoInput("No Value Provided")
     
     
     
@@ -104,13 +104,13 @@ class Fetcher:
                     Data.append(row)
                 # row[0] = row[0].lstrip('(').rstrip(')').split(',')
             print(Data)
-            if len(Data) == 0: raise noinput("Employee Not Found")    
+            if len(Data) == 0: raise NoInput("Employee Not Found")    
             else:
                 with open(f'Employee{ID}.csv','w') as file: 
                     Writer = csv.writer(file)
                     Writer.writerows(Data)
         else:
-            raise noinput("The given ID is not Valid")
+            raise NoInput("The given ID is not Valid")
         
             # print("Data Exported")
     # def empdata(self,ID,Columns=None): 
@@ -127,7 +127,7 @@ class Fetcher:
             self.cursor.execute("select Employee_ID from Employee")
             self.cursor.execute(query,values)
         except InterfaceError as err:
-            raise noinput('Invalid or No Input Provided')
+            raise NoInput('Invalid or No Input Provided')
         else: self.cursor.connection.commit()            
 
 
