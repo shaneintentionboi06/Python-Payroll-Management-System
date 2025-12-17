@@ -206,6 +206,7 @@ class Attendscreen(ModalScreen):
         data = event.value
         Remark = self.screen.query_one(Select).value
         try:
+            self.get_employee_ID(data)
             self.app.fetcher.markattendance(data,Remark)
             self.app.notify(f"Attendance Marked for Emp {data}")
             self.app.pop_screen()
@@ -219,9 +220,12 @@ class Attendscreen(ModalScreen):
         data = Emp_ID.value
         Remark = self.screen.query_one(Select).value
         try:
+            Name = self.get_employee_ID(data)[0]
             self.app.fetcher.markattendance(data,Remark)
-            self.app.notify(f"Attendance Marked for Emp {data}")
+            self.app.notify(f"Attendance Marked for {Name} (Emp {data})")
             self.app.pop_screen()
+        except TypeError:
+            self.app.notify("Invalid ID. Please enter Employee_ID",severity="warning")
         except Exception as err:
             self.app.notify(f"Failed, Error: {err}",severity='error')
             self.app.pop_screen()
@@ -243,6 +247,7 @@ class Attendscreen(ModalScreen):
                 nameinput.update('Name: ')
         except TypeError:
             nameinput.update("Invalid ID. Please enter Employee_ID")
+        
         except Exception as err:
             self.app.notify(f"Error  {err} ")
 
@@ -268,7 +273,7 @@ class Form(Screen):
             yield Input(placeholder='Enter',id='Department_Name',classes='Alpha')
             
             yield Label("Date of Joining",id='date_of_joininglabel')
-            yield Input(date.today().strftime('%Y-%m-%d'),id='Date_of_Joining')
+            yield Input(date.today().strftime('%Y-%m-%d'),id='Date_of_Joining',classes='Dateentries',max_length=10)
             
             yield Label("Designation",id='designationlabel')
             yield Input(placeholder='Enter',id='Designation', value=self.designation,classes='Alpha')
@@ -295,24 +300,55 @@ class Form(Screen):
     @on(Button.Pressed,'#Submit')
     def on_submit(self):
         import string
-        contactno = self.query_one("#ContactNo",Input)
-        value = contactno.value.strip()
-        if len(value) < 10:
-            self.app.notify("Error: No. of Digits Provided for Contact are less than 10",severity='error')
-            contactno.focus()
-            return None
-        text_fields = self.query('.Alpha')
-        specialchar = set(string.punctuation)
-        for field in text_fields:
-            if any(char.isdigit for char in field.value):
-                self.app.notify(f'Warning: {field.id} has numbers',severity='warning')
-            if any(char in specialchar for char in field.value):
-                self.app.notify(f'Warning: {field.id} has special characters',severity='error')
-                field.focus()
-                return None
         try:
+            contactno = self.query_one("#ContactNo",Input)
+            value = contactno.value.strip()
+            if len(value) < 10:
+                self.app.notify("Error: No. of Digits Provided for Contact are less than 10",severity='error')
+                contactno.focus()
+                return None
+            text_fields = self.query('.Alpha')
+            specialchar = set(string.punctuation)
+            for field in text_fields:
+                if any(char.isdigit() for char in field.value):
+                    self.app.notify(f'Warning: {field.id} has numbers field: {field.value}',severity='warning')
+                if any(char in specialchar for char in field.value):
+                    self.app.notify(f'Warning: {field.id} has special characters',severity='error')
+                    field.focus()
+                    return None
+            jdate = self.query_one('#Date_of_Joining',Input)
+            # Input format - YYYY-MM-DD 0123-56-89
+            jdateval = str(jdate.value).strip()
+            
+            try:
+                theDate = date.strftime(jdateval,'YYYY-MM-DD')
+            except ValueError:
+                self.app.notify("Date not in the Calender.")
+                return None
+            if len(jdateval) == 10:    
+                if jdateval[4] != '-' or jdateval[7] !='-': 
+                    self.app.notify('Invalid Date Format, Correct Format: YYYY-MM-DD',severity='error')
+                    jdate.focus()
+                    return None
+                if not (jdateval[:3].isnumeric() and jdateval[5:6].isnumeric() and jdateval[8:].isnumeric()):
+                    self.app.notify(f'Invalid Date Format. Do not put text in date. ',severity='error')
+                    jdate.focus()
+                    return None
+                
+            else : 
+                self.app.notify('Invalid Date Format',severity='error')
+                jdate.focus()
+                return None
+            
             inputs = self.query(Input) 
-            form_data= {input.id:input.value for input in inputs}
+            form_data = {}
+            for input in inputs:
+                if input.value == '':
+                    self.app.notify(f"{input.id} can't be empty")
+                    return None
+                else: form_data[input.id] = input.value
+            # form_data= {input.id:input.value for input in inputs if input.value != 0}
+            
             self.app.fetcher.adddata(form_data)
             self.app.notify("Employee Added")
             self.app.pop_screen()

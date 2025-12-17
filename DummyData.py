@@ -20,6 +20,13 @@ def Insert_dummy_data():
         # Insert dummy data into Employee
         employee_data = [
             ('John Doe', '2023-01-01', 'Manager', 1, '1234567890'),
+            ('John Jacob', '2024-02-01', 'Senior Manager', 2, '1234567890'),
+            ('John Jacob', '2024-02-01', 'Senior Manager', 2, '1234567890'),
+            ('Shreyansh', '2025-02-01', 'CEO', 2, '8390129381'),
+            ('John Who', '2024-02-01', 'Senior Manager', 2, '1234567890'),
+            ('John Cena', '2024-02-01', 'Senior Manager', 2, '1234567890'),
+            ('Vishesh', '2024-02-01', 'Senior Manager', 2, '1234567890'),
+            ('Krishna', '2024-02-01', 'Senior Manager', 2, '1234567890'),
             ('Jane Smith', '2023-02-15', 'Engineer', 1, '9876543210')
         ]
         sql = "INSERT INTO Employee (Name, Date_of_joining, Designation, Department_ID, ContactNo) VALUES (?, ?, ?, ?, ?)"
@@ -27,7 +34,14 @@ def Insert_dummy_data():
 
         # Insert dummy data into Salary_Structure
         salary_data = [(1, 10000, 5000, 3000, 2000, 1000, 500, 200, 100), 
-                      (2, 15000, 7500, 4500, 3000, 1500, 750, 300, 150)]
+                      (2, 15000, 7500, 4500, 3000, 1500, 750, 300, 150),
+                      (3, 15000, 7500, 4500, 3000, 1500, 750, 300, 150),
+                      (4, 15000, 7500, 4500, 3000, 1500, 750, 300, 150),
+                      (5, 15000, 7500, 4500, 3000, 1500, 750, 300, 150),
+                      (6, 15000, 7500, 4500, 3000, 1500, 750, 300, 150),
+                      (7, 15000, 7500, 4500, 3000, 1500, 750, 300, 150),
+                      (8, 15000, 7500, 4500, 3000, 1500, 750, 300, 150),
+                      (9, 15000, 7500, 4500, 3000, 1500, 750, 300, 150),]
         sql = "INSERT INTO Salary (Employee_ID, Basic_Salary, HRA, DA, Other_Allowance, PF_Contribution, Pro_Tax, Inc_Tax, Other_Deductions) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         mycursor.executemany(sql, salary_data)
         # mycursor.execute('select Salary_ST_ID from salary_structure')
@@ -52,6 +66,14 @@ def Insert_dummy_data():
         sql = "INSERT INTO Attendance (Employee_ID, Attendance_Date,Attendance, In_Time, Out_Time) VALUES (?, ?, ?, ?,?)"
         mycursor.executemany(sql, attendance_data)
 
+        sql = "INSERT INTO Department (Dept_ID, Department_Name) VALUES (?, ?)"
+        department_data = [
+            (1,'Information Technology'),
+            (2,'Sales Team'),
+            (3,'Administration Team'),
+        ]
+        mycursor.executemany(sql,department_data)
+        
         mydb.commit()
         print("Dummy data inserted successfully.")
 
