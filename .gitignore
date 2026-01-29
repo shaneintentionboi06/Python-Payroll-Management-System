@@ -10,4 +10,5 @@ wheels/
 databasetests/bigdata.db
 sturcturedatabase.py
 # unimportant files
-.csv
+*.csv
+*.db
